@@ -2,7 +2,7 @@
 // /output/entry.txt.
 // Chosen from 8 distinct candidates (see comparison.md): the fridge that
 // has been awake since 2019 roasting its owner for being awake since 2:47.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const LINE =
@@ -21,4 +21,12 @@ if (
 
 const dir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(dir, { recursive: true });
-writeFileSync(join(dir, "entry.txt"), LINE, "utf8");
+const out = join(dir, "entry.txt");
+writeFileSync(out, LINE, "utf8");
+
+// Read back and confirm the file is exactly the line: no trailing newline,
+// no extra bytes — the gate scores the file as it stands.
+const written = readFileSync(out, "utf8");
+if (written !== LINE) {
+  throw new Error("entry.txt does not match the intended line");
+}
